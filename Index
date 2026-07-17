@@ -154,7 +154,15 @@ body.mobile-ui .ab{font-size:10px;padding:3px 8px;border-radius:4px}
 .labt tr:hover td{background:var(--surface2)}
 .lgrp td{background:var(--surface);color:var(--accent2);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:6px 8px}
 .acell{background:var(--surface)!important}
-.aval{color:#fca5a5!important;font-weight:700}
+.aval{color:var(--red)!important;font-weight:700}
+body.light-theme .aval{color:#b91c1c!important}
+body.light-theme .acell{background:var(--surface2)!important}
+body.light-theme .labt{background:var(--surface)}
+body.light-theme .labt td{color:var(--text);border-color:var(--border)}
+body.light-theme .labt th{background:var(--surface2);color:var(--text2);border-color:var(--border)}
+body.light-theme .lgrp td{background:var(--surface2)!important;color:var(--text2)}
+body.light-theme .abg-section{background:var(--surface);border-color:var(--border)}
+body.light-theme .abg-toggle{background:var(--surface2);color:var(--text)}
 .txcard{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:10px}
 .txhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
 .txname{font-weight:700;color:var(--accent2);font-size:14px}
@@ -261,6 +269,12 @@ body.mobile-ui .mobox h3{font-size:15px;margin-bottom:12px}
   .secbody{display:block!important;padding:10px}
   body{background:#fff;color:#000}
   .chip{border:1px solid #ccc;background:#f5f5f5;color:#333}
+  /* Strip abnormal highlighting from labs in print */
+  .aval{color:#000!important;font-weight:400!important}
+  .acell{background:#fff!important}
+  .aval sup{display:none!important}
+  .labt td,.labt th{color:#000!important;border-color:#ccc!important;background:#fff!important}
+  .lgrp td{background:#f0f0f0!important;color:#333!important}
 }
 /* ── MOBILE UI MODE ─────────────────────────────────────────────────────────── */
 body.mobile-ui #layout{flex-direction:column;height:auto;overflow:visible}
@@ -323,6 +337,10 @@ body.mobile-ui #mob-toggle{background:var(--accent);color:#fff;border-color:var(
 body.mobile-ui .inv-grid{grid-template-columns:1fr!important}
 body.mobile-ui .irow{padding:8px 6px}
 body.mobile-ui .inv-handle{font-size:16px;padding:0 6px}
+body.mobile-ui .irow .inv-top-row{flex-wrap:wrap;gap:4px}
+body.mobile-ui .irow .inv-controls{flex-wrap:nowrap;flex-shrink:0;gap:4px}
+body.mobile-ui .irow .inv-st-sel{font-size:9px;max-width:80px;min-width:60px}
+body.mobile-ui .irow .iname{min-width:0;flex:1}
 body.mobile-ui .sbdg{font-size:8px;padding:2px 5px}
 .inv-st-sel{border:1px solid transparent;outline:none;appearance:none;-webkit-appearance:none;padding-right:12px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2394a3b8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 3px center}
 .inv-st-sel.bd-not-ordered{background-color:var(--s-not);color:var(--sc-not);border-color:var(--sc-not)}
@@ -1602,7 +1620,7 @@ function rLabs(p){
       const spark=nums.length>1?mkSpark(nums):'';
       const lastIdx=vals.map((v,i)=>v?i:-1).filter(i=>i>=0).pop();
       const lastAbn=lastIdx>=0&&isAbn(vals[lastIdx]);
-      h+=`<tr><td style="color:${lastAbn?'#fca5a5':'var(--text2)'};font-weight:500">${key}${lastAbn?' ⚠':''}</td><td>${spark}</td>`;
+      h+=`<tr><td style="color:${lastAbn?'var(--red)':'var(--text2)'};font-weight:500">${key}${lastAbn?' ⚠':''}</td><td>${spark}</td>`;
       h+=vals.map(v=>{const a=isAbn(v);const disp=v?stripB(v):'—';return`<td class="${a?'acell':''}" style="cursor:pointer" onclick="copyVal('${disp}','${key}')" title="Click to copy">${v?`<span class="${a?'aval':''}">${disp}${a?'<sup style="color:var(--red)">!</sup>':''}</span>`:'—'}</td>`}).join('');
       h+=`</tr>`;
     });
@@ -1947,10 +1965,10 @@ function iRow(inv,i,lt){
   var html='';
   html+='<div class="irow st-'+st+'" id="ir-'+inv.id+'" data-lt="'+lt+'" data-id="'+inv.id+'"';
   html+=' ondragover="invDragOver(event)" ondrop="invDrop(event,&apos;'+lt+'&apos;)" ondragend="invDragEnd(event)">';
-  html+='<div style="display:flex;gap:5px;align-items:center;justify-content:space-between">';
+  html+='<div class="inv-top-row" style="display:flex;gap:5px;align-items:center;justify-content:space-between">';
   html+='<span class="inv-handle" title="Drag to reorder"'+'  draggable="true"'+'  ondragstart="invDragStart(event,&apos;'+lt+'&apos;,&apos;'+inv.id+'&apos;)"'+'  ontouchstart="invTouchStart(event,&apos;'+lt+'&apos;,&apos;'+inv.id+'&apos;)"'+'  ontouchmove="invTouchMove(event)"'+'  ontouchend="invTouchEnd(event)">⠿</span>';
   html+='<input class="iname" value="'+q(esc(inv.name))+'" onchange="updInv(&apos;'+lt+'&apos;,&apos;'+inv.id+'&apos;,&apos;name&apos;,this.value)" title="Rename">';
-  html+='<div style="display:flex;gap:3px;align-items:center;flex-shrink:0">';
+  html+='<div class="inv-controls" style="display:flex;gap:3px;align-items:center;flex-shrink:0">';
   html+='<select class="inv-st-sel bd-'+st+'" onchange="setStSel(&apos;'+lt+'&apos;,&apos;'+inv.id+'&apos;,this.value)" style="font-size:9px;padding:1px 2px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-weight:700;max-width:88px;min-width:0;flex-shrink:0">'+stOpts+'</select>';
   html+='<button class="rmbtn" onclick="rmInv(&apos;'+lt+'&apos;,&apos;'+inv.id+'&apos;)">✕</button>';
   html+='</div></div>';
